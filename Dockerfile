@@ -133,6 +133,38 @@ RUN cd /opt/ \
     && rm -rf lib \
     && rm build.xml
 
+###############
+#Picard 2.14.0#
+###############
+ENV picard_version 2.14.0
+
+RUN mkdir /usr/picard
+WORKDIR /usr/picard
+RUN wget https://github.com/broadinstitute/picard/releases/download/${picard_version}/picard.jar
+
+###
+#R#
+###
+
+RUN apt-get update && apt-get install -y r-base littler
+
+RUN apt-get install -y lib32ncurses5 
+
+#############
+#verifyBamId#
+#############
+RUN apt-get update && apt-get install -y build-essential gcc-multilib apt-utils zlib1g-dev git
+
+RUN cd /tmp/ && git clone https://github.com/statgen/verifyBamID.git && git clone https://github.com/statgen/libStatGen.git
+
+RUN cd /tmp/libStatGen && git checkout tags/v1.0.14
+
+RUN cd /tmp/verifyBamID && git checkout tags/v1.1.3 && make
+
+RUN cp /tmp/verifyBamID/bin/verifyBamID /usr/local/bin
+
+RUN rm -rf /tmp/verifyBamID /tmp/libStatGen
+
 ######
 #Toil#
 ######
